@@ -1,0 +1,15 @@
+services:
+  frontend:
+    image: bogyumkim/bows-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  backend:
+    image: bogyumkim/bows-backend
+    ports:
+      - "8080:8080"
+    volumes:
+      - ${KUBE_CONFIG_PATH}:/root/.kube/config
+      - ${HELM_PATH}:/usr/bin/helm
