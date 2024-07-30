@@ -3,12 +3,12 @@ entries:
   bows-simpleApp:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2024-07-25T22:48:54.316594+09:00"
+    created: "2024-07-30T15:24:03.133058+09:00"
     description: A Helm chart for Kubernetes
-    digest: 4d8e8fa3b80f983937ab50b83510857ceff5658484b768b8ba7c9a2d4367bc22
+    digest: 40ab26c170be601d0687e1d8f0980ba1de794458b110c8f19c880d7312a8f4c1
     name: bows-simpleApp
     type: application
     urls:
     - bows-simpleApp-0.1.0.tgz
     version: 0.1.0
-generated: "2024-07-25T22:48:54.316078+09:00"
+generated: "2024-07-30T15:24:03.132281+09:00"
