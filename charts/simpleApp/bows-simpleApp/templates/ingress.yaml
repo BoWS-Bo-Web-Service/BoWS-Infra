@@ -1,39 +1,37 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
+  name: {{ .Values.projectName | lower }}-frontend-ingress
   namespace: {{ .Values.namespace }}
-  name: {{ .Values.projectName | lower }}-frontend-deployment
   labels:
     projectName: {{ .Values.projectName | lower }}
-    tier: frontend
+    tier: ingress
 spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      projectName: {{ .Values.projectName | lower }}
-      tier: frontend
-  template:
-    metadata:
-      labels:
-        projectName: {{ .Values.projectName | lower }}
-        tier: frontend
-    spec:
-      containers:
-        - name: {{ .Values.projectName | lower }}-frontend
-          image: {{ .Values.app.frontend.image.name }}:{{ .Values.app.frontend.image.tag }}
-          ports:
-            - containerPort: {{ .Values.app.frontend.port }}
+  entryPoints:
+    - web
+  routes:
+    - match: {{ printf "Host(`%s`)" (.Values.domain) }}
+      kind: Rule
+      services:
+        - name: {{ .Values.projectName | lower }}-frontend-service
+          port: {{ .Values.app.frontend.port }}
+
 ---
-apiVersion: v1
-kind: Service
+
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
+  name: {{ .Values.projectName | lower }}-backend-ingress
   namespace: {{ .Values.namespace }}
-  name: {{ .Values.projectName | lower }}-frontend-service
-spec:
-  selector:
+  labels:
     projectName: {{ .Values.projectName | lower }}
-    tier: frontend
-  ports:
-    - protocol: {{ .Values.app.frontend.protocol }}
-      port: {{ .Values.app.frontend.port }}
-      targetPort: {{ .Values.app.frontend.port }}
+    tier: ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: {{ printf "Host(`%s`)" (.Values.domain) }} && PathPrefix(`/api`)
+      kind: Rule
+      services:
+        - name: {{ .Values.projectName | lower }}-backend-service
+          port: {{ .Values.app.backend.port }}
