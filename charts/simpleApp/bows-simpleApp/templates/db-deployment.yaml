@@ -42,6 +42,9 @@ kind: Service
 metadata:
   namespace: {{ .Values.namespace }}
   name: {{ .Values.projectName | lower }}-db-service
+  labels:
+    projectName: {{ .Values.projectName | lower }}
+    tier: db
 spec:
   selector:
     projectName: {{ .Values.projectName | lower }}
