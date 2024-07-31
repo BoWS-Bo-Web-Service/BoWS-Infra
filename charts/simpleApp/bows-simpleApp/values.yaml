@@ -1,6 +1,7 @@
 namespace: my-app
 
 projectName:
+projectId:
 domain:
 
 app:
