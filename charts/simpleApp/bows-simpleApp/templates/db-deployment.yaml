@@ -12,13 +12,13 @@ spec:
   selector:
     matchLabels:
       projectName: {{ .Values.projectName | lower }}
-      projectId: {{ .Values.projectId }}
+      projectId: {{ .Values.projectId | quote }}
       tier: db
   template:
     metadata:
       labels:
         projectName: {{ .Values.projectName | lower }}
-        projectId: {{ .Values.projectId }}
+        projectId: {{ .Values.projectId | quote }}
         tier: db
     spec:
       containers:
@@ -47,12 +47,12 @@ metadata:
   name: {{ .Values.projectName | lower }}-db-service
   labels:
     projectName: {{ .Values.projectName | lower }}
-    projectId: {{ .Values.projectId }}
+    projectId: {{ .Values.projectId | quote }}
     tier: db
 spec:
   selector:
     projectName: {{ .Values.projectName | lower }}
-    projectId: {{ .Values.projectId }}
+    projectId: {{ .Values.projectId | quote }}
     tier: db
   ports:
     - protocol: {{ .Values.app.db.protocol }}
