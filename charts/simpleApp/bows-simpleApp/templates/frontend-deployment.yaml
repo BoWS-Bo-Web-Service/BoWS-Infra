@@ -5,17 +5,20 @@ metadata:
   name: {{ .Values.projectName | lower }}-frontend-deployment
   labels:
     projectName: {{ .Values.projectName | lower }}
+    projectId: {{ .Values.projectId }}
     tier: frontend
 spec:
   replicas: 1
   selector:
     matchLabels:
       projectName: {{ .Values.projectName | lower }}
+      projectId: {{ .Values.projectId }}
       tier: frontend
   template:
     metadata:
       labels:
         projectName: {{ .Values.projectName | lower }}
+        projectId: {{ .Values.projectId }}
         tier: frontend
     spec:
       containers:
@@ -31,10 +34,12 @@ metadata:
   name: {{ .Values.projectName | lower }}-frontend-service
   labels:
     projectName: {{ .Values.projectName | lower }}
+    projectId: {{ .Values.projectId }}
     tier: frontend
 spec:
   selector:
     projectName: {{ .Values.projectName | lower }}
+    projectId: {{ .Values.projectId }}
     tier: frontend
   ports:
     - protocol: {{ .Values.app.frontend.protocol }}

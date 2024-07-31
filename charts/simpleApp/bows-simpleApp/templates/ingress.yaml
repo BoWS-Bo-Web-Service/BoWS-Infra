@@ -5,6 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     projectName: {{ .Values.projectName | lower }}
+    projectId: {{ .Values.projectId }}
     tier: ingress
 spec:
   entryPoints:
@@ -25,6 +26,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     projectName: {{ .Values.projectName | lower }}
+    projectId: {{ .Values.projectId }}
     tier: ingress
 spec:
   entryPoints:
