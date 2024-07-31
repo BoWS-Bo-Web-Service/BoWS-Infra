@@ -14,7 +14,7 @@ app:
     database: mysql
   frontend:
     image:
-      name:
+      name: dd
       tag: latest
     port: 80
     protocol: TCP

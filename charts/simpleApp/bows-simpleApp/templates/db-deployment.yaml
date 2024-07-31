@@ -5,7 +5,7 @@ metadata:
   namespace: {{ .Values.namespace }}
   labels:
     projectName: {{ .Values.projectName | lower }}
-    projectId: {{ .Values.projectId }}
+    projectId: {{ .Values.projectId | quote }}
     tier: db
 spec:
   replicas: 1
