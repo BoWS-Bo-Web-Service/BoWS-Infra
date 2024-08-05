@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: {{ .Values.namespace }}
-  name: {{ .Values.projectName | lower }}-backend-deployment
+  name: {{ .Values.projectId | quote }}-backend-deployment
   labels:
     projectName: {{ .Values.projectName | lower }}
     projectId: {{ .Values.projectId | quote }}
@@ -22,7 +22,7 @@ spec:
         tier: backend
     spec:
       containers:
-        - name: {{ .Values.projectName | lower }}-backend-server
+        - name: {{ .Values.projectId | quote }}-backend-server
           image: {{ .Values.app.backend.image.name }}:{{ .Values.app.backend.image.tag }}
           ports:
             - containerPort: {{ .Values.app.backend.port }}
@@ -36,7 +36,7 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: {{ .Values.namespace }}
-  name: {{ .Values.projectName | lower }}-backend-service
+  name: {{ .Values.projectId | quote }}-backend-service
   labels:
     projectName: {{ .Values.projectName | lower }}
     projectId: {{ .Values.projectId | quote }}
