@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: {{ .Values.namespace }}
-  name: {{ .Values.projectId | quote }}-frontend-deployment
+  name: {{ .Values.projectId }}-frontend-deployment
   labels:
     projectName: {{ .Values.projectName | lower }}
     projectId: {{ .Values.projectId | quote }}
@@ -22,7 +22,7 @@ spec:
         tier: frontend
     spec:
       containers:
-        - name: {{ .Values.projectId | quote }}-frontend
+        - name: {{ .Values.projectId }}-frontend
           image: {{ .Values.app.frontend.image.name }}:{{ .Values.app.frontend.image.tag }}
           ports:
             - containerPort: {{ .Values.app.frontend.port }}
@@ -31,7 +31,7 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: {{ .Values.namespace }}
-  name: {{ .Values.projectName | lower }}-frontend-service
+  name: {{ .Values.projectId }}-frontend-service
   labels:
     projectName: {{ .Values.projectName | lower }}
     projectId: {{ .Values.projectId | quote }}

@@ -1,7 +1,7 @@
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: {{ .Values.projectId | quote }}-frontend-ingress
+  name: {{ .Values.projectId }}-frontend-ingress
   namespace: {{ .Values.namespace }}
   labels:
     projectName: {{ .Values.projectName | lower }}
@@ -14,7 +14,7 @@ spec:
     - match: {{ printf "Host(`%s`)" (.Values.domain) }}
       kind: Rule
       services:
-        - name: {{ .Values.projectId | quote }}-frontend-service
+        - name: {{ .Values.projectId }}-frontend-service
           port: {{ .Values.app.frontend.port }}
 
 ---
@@ -22,7 +22,7 @@ spec:
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
-  name: {{ .Values.projectId | quote }}-backend-ingress
+  name: {{ .Values.projectId }}-backend-ingress
   namespace: {{ .Values.namespace }}
   labels:
     projectName: {{ .Values.projectName | lower }}
@@ -35,5 +35,5 @@ spec:
     - match: {{ printf "Host(`%s`)" (.Values.domain) }} && PathPrefix(`/api`)
       kind: Rule
       services:
-        - name: {{ .Values.projectId | quote }}-backend-service
+        - name: {{ .Values.projectId }}-backend-service
           port: {{ .Values.app.backend.port }}
