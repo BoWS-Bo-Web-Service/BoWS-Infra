@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.projectId | quote }}-db
+  name: {{ .Values.projectId }}-db
   namespace: {{ .Values.namespace }}
   labels:
     projectName: {{ .Values.projectName | lower }}
@@ -22,7 +22,7 @@ spec:
         tier: db
     spec:
       containers:
-        - name: {{ .Values.projectId | quote }}-db
+        - name: {{ .Values.projectId }}-db
           image: {{ .Values.app.db.image.name }}:{{ .Values.app.db.image.tag }}
           ports:
             - containerPort: {{ .Values.app.db.port }}
@@ -32,10 +32,10 @@ spec:
               value: {{ $value }}
           {{- end }}
           volumeMounts:
-            - name:  {{ .Values.projectId | quote }}-storage
-              mountPath: /var/lib/{{ .Values.projectId | quote }}/storage
+            - name:  {{ .Values.projectId }}-storage
+              mountPath: /var/lib/{{ .Values.projectId }}/storage
       volumes:
-        - name: {{ .Values.projectId | quote }}-storage
+        - name: {{ .Values.projectId }}-storage
           emptyDir: {}
 
 ---
@@ -44,7 +44,7 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: {{ .Values.namespace }}
-  name: {{ .Values.projectId | quote }}-db-service
+  name: {{ .Values.projectId }}-db-service
   labels:
     projectName: {{ .Values.projectName | lower }}
     projectId: {{ .Values.projectId | quote }}
