@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: {{ .Values.namespace }}
-  name: {{ .Values.projectName | lower }}-frontend-deployment
+  name: {{ .Values.projectId | quote }}-frontend-deployment
   labels:
     projectName: {{ .Values.projectName | lower }}
     projectId: {{ .Values.projectId | quote }}
@@ -22,7 +22,7 @@ spec:
         tier: frontend
     spec:
       containers:
-        - name: {{ .Values.projectName | lower }}-frontend
+        - name: {{ .Values.projectId | quote }}-frontend
           image: {{ .Values.app.frontend.image.name }}:{{ .Values.app.frontend.image.tag }}
           ports:
             - containerPort: {{ .Values.app.frontend.port }}
