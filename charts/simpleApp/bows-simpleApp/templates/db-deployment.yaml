@@ -1,5 +1,19 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: db-pvc-{{ .Values.projectId }}
+  namespace: {{ .Values.namespace }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: {{ .Values.app.db.storageClass }}
+  resources:
+    requests:
+      storage: {{ .Values.app.db.storageSize }}
+
+---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   name: db-{{ .Values.projectId }}
   namespace: {{ .Values.namespace }}
@@ -8,6 +22,7 @@ metadata:
     projectId: {{ .Values.projectId | quote }}
     tier: db
 spec:
+  serviceName: db-service-{{ .Values.projectId }}
   replicas: 1
   selector:
     matchLabels:
@@ -33,10 +48,17 @@ spec:
           {{- end }}
           volumeMounts:
             - name:  storage-{{ .Values.projectId }}
-              mountPath: /var/lib/{{ .Values.projectId }}/storage
-      volumes:
-        - name: storage-{{ .Values.projectId }}
-          emptyDir: {}
+              mountPath: /var/lib/mysql
+              subPath: {{ .Values.projectId }}
+  volumeClaimTemplates:
+    - metadata:
+        name: storage-{{ .Values.projectId }}
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        storageClassName: {{ .Values.app.db.storageClass }}
+        resources:
+          requests:
+            storage: {{ .Values.app.db.storageSize }}
 
 ---
 

@@ -24,6 +24,8 @@ app:
       tag: latest
     port: 3306
     protocol: TCP
+    storageClass: nfs-client
+    storageSize: 1Gi
     env:
       MYSQL_ROOT_PASSWORD:
       MYSQL_DATABASE:
