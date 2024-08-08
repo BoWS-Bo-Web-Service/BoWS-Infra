@@ -1,8 +1,26 @@
 apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: db-schema-{{ .Values.projectId }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    projectName: {{ .Values.projectName | lower }}
+    projectId: {{ .Values.projectId | quote }}
+    tier: db
+data:
+  init-{{ .Values.projectId }}.sql: |
+    {{ .Values.app.db.schema | indent 4 }}
+
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: db-pvc-{{ .Values.projectId }}
   namespace: {{ .Values.namespace }}
+  labels:
+    projectName: {{ .Values.projectName | lower }}
+    projectId: {{ .Values.projectId | quote }}
+    tier: db
 spec:
   accessModes:
     - ReadWriteOnce
@@ -36,6 +54,13 @@ spec:
         projectId: {{ .Values.projectId | quote }}
         tier: db
     spec:
+      initContainers:
+        - name: init-symlink
+          image: busybox
+          command: [ 'sh', '-c', 'ln -s /docker-entrypoint-initdb.d/bows-{{ .Values.projectId }}/init-{{ .Values.projectId }}.sql /docker-entrypoint-initdb.d/init-{{ .Values.projectId }}.sql' ]
+          volumeMounts:
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d
       containers:
         - name: db-{{ .Values.projectId }}
           image: {{ .Values.app.db.image.name }}:{{ .Values.app.db.image.tag }}
@@ -47,9 +72,15 @@ spec:
               value: {{ $value }}
           {{- end }}
           volumeMounts:
-            - name:  storage-{{ .Values.projectId }}
+            - name: storage-{{ .Values.projectId }}
               mountPath: /var/lib/mysql
               subPath: bows-{{ .Values.projectId }}
+            - name: init-script
+              mountPath: /docker-entrypoint-initdb.d/bows-{{ .Values.projectId }}
+      volumes:
+        - name: init-script
+          configMap:
+            name: db-schema-{{ .Values.projectId }}
   volumeClaimTemplates:
     - metadata:
         name: storage-{{ .Values.projectId }}
