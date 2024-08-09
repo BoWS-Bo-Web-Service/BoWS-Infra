@@ -8,10 +8,13 @@ metadata:
     projectId: {{ .Values.projectId | quote }}
     tier: db
 data:
-  init-{{ .Values.projectId }}.sql: |
-    {{ .Values.app.db.schema | indent 4 }}
+  init-{{ .Values.projectId }}.sh: |
+    #!/bin/sh
+    echo {{ .Values.app.db.schemaEncoded }} | base64 -d > /docker-entrypoint-initdb.d/init-{{ .Values.projectId }}.sql
+  schema-{{ .Values.projectId }}.sql.base64: {{ .Values.app.db.schemaEncoded }}
 
 ---
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -30,6 +33,7 @@ spec:
       storage: {{ .Values.app.db.storageSize }}
 
 ---
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
@@ -55,11 +59,13 @@ spec:
         tier: db
     spec:
       initContainers:
-        - name: init-symlink
+        - name: init-db-{{ .Values.projectId }}
           image: busybox
-          command: [ 'sh', '-c', 'ln -s /docker-entrypoint-initdb.d/bows-{{ .Values.projectId }}/init-{{ .Values.projectId }}.sql /docker-entrypoint-initdb.d/init-{{ .Values.projectId }}.sql' ]
+          command: ['sh', '/scripts/init-{{ .Values.projectId }}.sh']
           volumeMounts:
-            - name: init-script
+            - name: init-script-{{ .Values.projectId }}
+              mountPath: /scripts
+            - name: init-sql-{{ .Values.projectId }}
               mountPath: /docker-entrypoint-initdb.d
       containers:
         - name: db-{{ .Values.projectId }}
@@ -75,12 +81,17 @@ spec:
             - name: storage-{{ .Values.projectId }}
               mountPath: /var/lib/mysql
               subPath: bows-{{ .Values.projectId }}
-            - name: init-script
-              mountPath: /docker-entrypoint-initdb.d/bows-{{ .Values.projectId }}
+            - name: init-sql-{{ .Values.projectId }}
+              mountPath: /docker-entrypoint-initdb.d
       volumes:
-        - name: init-script
+        - name: init-script-{{ .Values.projectId }}
           configMap:
             name: db-schema-{{ .Values.projectId }}
+            items:
+              - key: init-{{ .Values.projectId }}.sh
+                path: init-{{ .Values.projectId }}.sh
+        - name: init-sql-{{ .Values.projectId }}
+          emptyDir: {}
   volumeClaimTemplates:
     - metadata:
         name: storage-{{ .Values.projectId }}
