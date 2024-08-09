@@ -26,7 +26,7 @@ app:
     protocol: TCP
     storageClass: nfs-client
     storageSize: 1Gi
-    schema:
+    schemaEncoded:
     env:
       MYSQL_ROOT_PASSWORD:
       MYSQL_DATABASE:
