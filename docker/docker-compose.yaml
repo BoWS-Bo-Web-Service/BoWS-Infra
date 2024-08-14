@@ -4,7 +4,9 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ${NGINX_CONFIG_PATH}:/etc/nginx/nginx.conf
+      - ./nginx.conf.template:/etc/nginx/templates/nginx.conf.template
+    environment:
+      - INGRESS_CONTROLLER_EXTERNAL_IP=${INGRESS_CONTROLLER_EXTERNAL_IP}
     depends_on:
       - frontend
       - backend
