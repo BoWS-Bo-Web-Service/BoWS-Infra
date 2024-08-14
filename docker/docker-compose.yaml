@@ -1,15 +1,49 @@
 services:
-  frontend:
-    image: bogyumkim/bows-frontend
+  nginx:
+    image: nginx:latest
     ports:
       - "80:80"
+    volumes:
+      - ${NGINX_CONFIG_PATH}:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+
+  frontend:
+    image: bogyumkim/bows-frontend
+    expose:
+      - "80"
     depends_on:
       - backend
 
   backend:
     image: bogyumkim/bows-backend
-    ports:
-      - "8080:8080"
+    expose:
+      - "8080"
     volumes:
       - ${KUBE_CONFIG_PATH}:/root/.kube/config
       - ${HELM_PATH}:/usr/bin/helm
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD}
+
+  db:
+    image: mysql:latest
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=Asia/Seoul
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+
+volumes:
+  mysql_data:
