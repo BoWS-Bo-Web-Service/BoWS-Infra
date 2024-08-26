@@ -15,25 +15,6 @@ data:
 
 ---
 
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: db-pvc-{{ .Values.projectId }}
-  namespace: {{ .Values.namespace }}
-  labels:
-    projectName: {{ .Values.projectName | lower }}
-    projectId: {{ .Values.projectId | quote }}
-    tier: db
-spec:
-  accessModes:
-    - ReadWriteOnce
-  storageClassName: {{ .Values.app.db.storageClass }}
-  resources:
-    requests:
-      storage: {{ .Values.app.db.storageSize }}
-
----
-
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
