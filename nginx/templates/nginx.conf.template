@@ -7,9 +7,28 @@ events {
     worker_connections 1024;
 }
 
-http {
+stream {
+    map $remote_addr$proxy_protocol_addr$server_port$ssl_preread_server_name $backend {
+        # HTTP 트래픽 (80 포트)
+        ~^.*80bows\.co\.kr$ 127.0.0.1:8081;
+        ~^.*80 127.0.0.1:8082;
+
+        # HTTPS 트래픽 (443 포트)
+        ~^.*443bows\.co\.kr$ 127.0.0.1:8443;
+        ~^.*443 ${INGRESS_CONTROLLER_EXTERNAL_IP}:443;
+    }
+
     server {
         listen 80;
+        listen 443;
+        ssl_preread on;
+        proxy_pass $backend;
+    }
+}
+
+http {
+    server {
+        listen 127.0.0.1:8081;
         server_name bows.co.kr;
 
         location /.well-known/acme-challenge/ {
@@ -23,8 +42,8 @@ http {
     }
 
     server {
-        listen 80;
-        server_name ~^(?!bows\.co\.kr).*$;
+        listen 127.0.0.1:8082;
+        server_name _;
 
         location /.well-known/acme-challenge/ {
             proxy_pass http://${INGRESS_CONTROLLER_EXTERNAL_IP};
@@ -40,7 +59,7 @@ http {
     }
 
     server {
-        listen 443 ssl;
+        listen 127.0.0.1:8443 ssl;
         server_name bows.co.kr;
         server_tokens off;
 
@@ -61,26 +80,4 @@ http {
             proxy_set_header X-Real-IP $remote_addr;
         }
     }
-
-    server {
-        listen 443;
-        server_name ~^(?!bows\.co\.kr).*$;
-        server_tokens off;
-
-        location / {
-            proxy_pass https://${INGRESS_CONTROLLER_EXTERNAL_IP};
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_ssl_server_name on;
-            proxy_intercept_errors on;
-            error_page 404 = @handle_404;
-        }
-
-        location @handle_404 {
-            return 404 "The requested resource could not be found.";
-        }
-    }
-
 }
