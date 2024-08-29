@@ -28,7 +28,13 @@ spec:
             - containerPort: {{ .Values.app.backend.port }}
           env:
             - name: MYSQL_HOST
-              value: {{ printf "%s-db-service" (.Values.projectName | lower) | quote }}
+              value: "db-service-{{ .Values.projectId }}"
+            - name: MYSQL_DATABASE
+              value: {{ .Values.app.db.env.MYSQL_DATABASE | quote }}
+            - name: MYSQL_USER
+              value: {{ .Values.app.db.env.MYSQL_USER | quote }}
+            - name: MYSQL_PASSWORD
+              value: {{ .Values.app.db.env.MYSQL_PASSWORD | quote }}
 
 ---
 
