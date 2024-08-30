@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-bows
+spec:
+  acme:
+    email: kim.bokeum@gmail.com
+    privateKeySecretRef:
+      name: letsencrypt-bows
+    server: https://acme-v02.api.letsencrypt.org/directory
+    solvers:
+      - http01:
+          ingress:
+            class: traefik
